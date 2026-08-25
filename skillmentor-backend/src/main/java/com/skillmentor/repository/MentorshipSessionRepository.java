@@ -1,0 +1,24 @@
+package com.skillmentor.repository;
+
+import com.skillmentor.model.MentorshipSession;
+import com.skillmentor.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Repository
+public interface MentorshipSessionRepository extends JpaRepository<MentorshipSession, Long> {
+    List<MentorshipSession> findByStudent(User student);
+    List<MentorshipSession> findByMentor(User mentor);
+    List<MentorshipSession> findByStudentOrMentor(User student, User mentor);
+
+    @Query("SELECT s FROM MentorshipSession s WHERE s.mentor.id = :mentorId " +
+           "AND s.status IN ('PENDING', 'ACCEPTED') " +
+           "AND s.scheduledTime = :scheduledTime")
+    List<MentorshipSession> findConflictingSessions(@Param("mentorId") Long mentorId,
+                                                    @Param("scheduledTime") LocalDateTime scheduledTime);
+}

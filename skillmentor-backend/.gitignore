@@ -1,0 +1,26 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### Environment & Secrets ###
+.env
+.env.*
+!.env.example
+.env.local
+
+### Embedded DB & Storage ###
+data/
+*.mv.db
+*.trace.db
+uploads/
+logs/
+*.log
+
+### System Files & IDEs ###
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/
+
