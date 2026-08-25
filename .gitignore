@@ -1,0 +1,29 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+.env.local
+.env.*.local
+
+# Dependency & Build Artifacts
+node_modules/
+dist/
+dist-ssr/
+target/
+
+# Embedded DB & Runtime Storage
+data/
+*.mv.db
+*.trace.db
+uploads/
+logs/
+*.log
+
+# IDE & OS Metadata
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
