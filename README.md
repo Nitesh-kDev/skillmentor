@@ -189,7 +189,7 @@ The backend performs:
 * Duplicate order protection
 * Safe session state transitions
 
-> ⚠️ Razorpay credentials must be supplied through environment variables and should never be committed to GitHub.
+> ⚠️ Razorpay credentials must be supplied through environment variables 
 
 ---
 
@@ -392,8 +392,6 @@ RAZORPAY_KEY_ID=your_razorpay_test_key_id
 RAZORPAY_KEY_SECRET=your_razorpay_test_key_secret
 ```
 
-> Never commit `.env` or real credentials to GitHub.
-
 ---
 
 # 🚀 Backend Setup
@@ -480,8 +478,6 @@ The application provides development/demo accounts through `DatabaseSeeder.java`
 | 👔 Mentor  | `mentor.rajeev@tech.com`   | `password123` | Verified Mentor         |
 | 🎓 Alumni  | `alumni.himanshu@faang.com` | `password123` | Verified Alumni         |
 | 🛠️ Admin  | `admin@skillmentor.com`  | `password123` | Admin Governance Access |
-
-> **Note:** These are development/demo credentials only. Do not use these credentials in production.
 
 ---
 
@@ -624,9 +620,12 @@ The project supports:
 Development → H2
 Deployment   → MySQL
 ```
+---
 
 ## ❤️ Acknowledgement
 
-<p align="center">
-  Built with ❤️ as a student project focused on peer learning, mentorship, and skill exchange.
-</p>
+This project was designed and developed by **Nitesh Kumar**  
+Master of Computer Applications (MCA), JSS Academy of Technical Education, Noida
+[![GitHub](https://img.shields.io/badge/GitHub-Nitesh--kDev-black?style=for-the-badge&logo=github)](https://github.com/Nitesh-kDev)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Nitesh--Kumar-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/nitesh-kumar-3b70bb387/)
+
