@@ -1,86 +1,260 @@
-# 🎓 SkillMentor Platform
-
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![React](https://img.shields.io/badge/React-18.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/Vite-7.3.6-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.1-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Razorpay](https://img.shields.io/badge/Razorpay-Standard_Checkout-0C2340?style=for-the-badge&logo=razorpay&logoColor=white)](https://razorpay.com/)
-
+# 🎓 SkillMentor
 
 > **Multi-Program Peer Learning, Mentorship & Student Help Request Platform running on a Hybrid Economy.**
 
----
+<p align="center">
 
-## 📌 Executive Summary
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.3-6DB33F?style=for-the-badge\&logo=springboot\&logoColor=white)
+![React](https://img.shields.io/badge/React-18.2.0-61DAFB?style=for-the-badge\&logo=react\&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-7.3.6-646CFF?style=for-the-badge\&logo=vite\&logoColor=white)
+![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge\&logo=openjdk\&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.1-38B2AC?style=for-the-badge\&logo=tailwind-css\&logoColor=white)
+![Razorpay](https://img.shields.io/badge/Razorpay-Standard_Checkout-0C2340?style=for-the-badge\&logo=razorpay\&logoColor=white)
 
-**SkillMentor** is an all-in-one educational platform engineered to connect students across multiple academic programs (`BTech`, `MCA`, `BBA`, `MBA`, `LLB`, and more) for peer-to-peer assistance, skill swapping, and professional 1-on-1 mentorship.
-
-The platform operates on a **Hybrid Economy Engine**:
-1. **⚡ SkillMentor Free Credit Tokens**: Powers student-to-student peer help requests and zero-cost reciprocal skill exchanges.
-2. **💳 Real Money INR (₹)**: Enables paid 1-on-1 mentorship sessions with verified alumni and industry mentors, secured via Razorpay Standard Checkout.
-
----
-
-## 🌟 Key Features & Core Modules
-
-### 1. ⚡ Peer Help Requests & Reciprocal Skill Exchange
-- **Categorized Requests**: Students create help requests under categories such as `SKILL_LEARNING`, `PROJECT_HELP`, `DOUBT_SOLVING`, `ACADEMIC_HELP`, `CAREER_GUIDANCE`, `INTERVIEW_PREPARATION`, `RESUME_PROFILE`, and `MENTORSHIP`.
-- **Credit Escrow System**: Budgets credit tokens for requests. Credits are held in escrow when a helper is selected and automatically transferred to the helper upon task completion.
-- **Smart Reciprocal Matcher**: Automatically matches students with complementary skills (`Student A teaches X & wants Y` $\leftrightarrow$ `Student B teaches Y & wants X`) for zero-credit mutual skill swaps.
-
-### 2. 🎓 Same-College Alumni Benefit & Dynamic Pricing
-- **Verified Status**: Mentors and Alumni undergo identity verification (LinkedIn URL, Govt ID, and company proof).
-- **Alumni Discount**: Verified alumni can grant **100% Free** or **Percentage Discounted** guidance to students enrolled in the same college (`student.collegeName` matches `mentor.collegeName`).
-
-### 3. 🗓️ Structured Availability & User Identity
-- **Schedule Editor (`AvailabilityEditor.jsx`)**: Structured weekly schedule planner (Monday through Sunday) with custom time ranges.
-- **Dynamic Role Badge**: Exposes user roles (`STUDENT`, `MENTOR`, `ALUMNI`, `ADMIN`) across discovery cards, profile modals, and live chat sessions.
-
-### 4. 💬 Real-Time Live Chat (STOMP WebSockets)
-- **Bi-Directional Messaging**: Real-time communication powered by WebSockets (`STOMP` over `SockJS`) with HTTP REST API fallbacks.
-- **Security & Authorization**: Server-side checks enforce that only active session participants can exchange messages. Messaging is automatically locked on `CANCELLED` or `REJECTED` sessions.
-
-### 5. 💳 Razorpay Web Checkout Integration
-- **Secure Payment Flow**: Seamless creation of Razorpay Orders (`/api/payments/razorpay/order`) and server-side HMAC SHA-256 signature verification (`/api/payments/razorpay/verify`).
-- **Idempotency Guard**: Prevents duplicate order creation and ensures safe state transitions for mentorship sessions.
-
-### 6. 🛠️ Admin Governance & Verification Portal
-- **Verification Workbench**: Review pending mentor credentials (LinkedIn, document verification, company details) with Approve/Reject actions.
-- **Moderation & Auditing**: User suspension controls, report resolution workflows, and immutable audit logs (`AdminActionLog`).
+</p>
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## 📌 Overview
 
-### Tech Stack Matrix
+**SkillMentor** is an educational platform designed to connect students across multiple academic programs such as **BTech, MCA, BBA, MBA, LLB**, and more.
 
-| Tier | Technology | Purpose |
-| :--- | :--- | :--- |
-| **Backend Framework** | Spring Boot 3.2.3 | Core Web API & Application Engine |
-| **Language** | Java 17 | Primary Programming Language |
-| **Security** | Spring Security + JJWT 0.12.5 | Authentication & Stateless Token Management |
-| **Database** | Embedded H2 File DB (`skillmentor_db`) | Default Persistence Engine (MySQL compatible) |
-| **OR Framework** | Spring Data JPA / Hibernate | Object-Relational Mapping & Query Generation |
-| **Real-time Messaging** | Spring WebSocket (STOMP + SockJS) | Live Session Chat |
-| **Payments** | Razorpay Java SDK 1.4.6 | Payment Gateway Processing |
-| **Documentation** | SpringDoc OpenAPI 2.3.0 | Swagger UI API Specs (`/swagger-ui.html`) |
-| **Frontend Framework**| React 18.2 + Vite 7.3 | High-performance Single Page Application |
-| **Styling** | Tailwind CSS 3.4 + Vanilla CSS | Modern UI Styling & Design Tokens |
-| **Icons** | Lucide React | Visual UI Icons |
+The platform enables students to:
+
+* Get help from other students.
+* Exchange skills using a credit-based system.
+* Find mentors and alumni.
+* Book 1-on-1 mentorship sessions.
+* Communicate through real-time chat.
+* Access discounted or free guidance from verified same-college alumni.
+
+### 💡 Hybrid Economy
+
+SkillMentor uses two types of transactions:
+
+| Economy                   | Purpose                                                    |
+| ------------------------- | ---------------------------------------------------------- |
+| ⚡ **Free Credit Tokens**  | Student-to-student peer help and reciprocal skill exchange |
+| 💳 **Real Money (INR ₹)** | Paid 1-on-1 mentorship sessions through Razorpay           |
 
 ---
 
-## 📐 System Architecture Diagram
+# 🌟 Key Features
+
+## 1. ⚡ Peer Help Requests & Skill Exchange
+
+Students can create help requests based on their requirements.
+
+### Request Categories
+
+* `SKILL_LEARNING`
+* `PROJECT_HELP`
+* `DOUBT_SOLVING`
+* `ACADEMIC_HELP`
+* `CAREER_GUIDANCE`
+* `INTERVIEW_PREPARATION`
+* `RESUME_PROFILE`
+* `MENTORSHIP`
+
+### Credit Escrow
+
+When a helper is selected:
+
+1. The required credits are locked.
+2. The helper completes the task.
+3. Credits are transferred to the helper after completion.
+
+### 🔄 Reciprocal Skill Matcher
+
+The platform can identify students with complementary skills.
+
+For example:
+
+```text
+Student A:
+Offers → Java
+Wants  → React
+
+Student B:
+Offers → React
+Wants  → Java
+```
+
+The system can identify this as a potential **zero-credit reciprocal skill exchange**.
+
+---
+
+## 2. 🎓 Same-College Alumni Benefits
+
+Verified mentors and alumni can provide special benefits to students from the same college.
+
+### Verification
+
+Mentor/alumni verification can include:
+
+* LinkedIn profile
+* Government ID document
+* Company information
+
+### Alumni Benefits
+
+Verified alumni can provide:
+
+* **100% free guidance**
+* **Percentage-based discounts**
+
+The benefit can be applied when the student's college matches the mentor's college.
+
+---
+
+## 3. 🗓️ Availability & User Identity
+
+### Structured Availability
+
+The platform provides a weekly availability editor where mentors can configure:
+
+* Monday–Sunday schedules
+* Custom time ranges
+* Available mentorship slots
+
+### Dynamic Role Badges
+
+The system supports:
+
+* 🎓 `STUDENT`
+* 👔 `MENTOR`
+* 🎓 `ALUMNI`
+* 🛠️ `ADMIN`
+
+These roles are displayed across relevant parts of the application.
+
+---
+
+## 4. 💬 Real-Time Live Chat
+
+SkillMentor provides real-time communication using:
+
+* Spring WebSocket
+* STOMP
+* SockJS
+
+### Features
+
+* Bi-directional messaging
+* Real-time message delivery
+* Chat history
+* HTTP REST fallback
+* Session-based authorization
+
+Only active session participants can exchange messages.
+
+Chat access is automatically restricted for sessions that are:
+
+* `CANCELLED`
+* `REJECTED`
+
+---
+
+## 5. 💳 Razorpay Payment Integration
+
+SkillMentor supports Razorpay Standard Checkout for paid mentorship sessions.
+
+### Payment Flow
+
+```text
+Student
+   ↓
+Book Mentorship Session
+   ↓
+Create Razorpay Order
+   ↓
+Razorpay Checkout
+   ↓
+Payment
+   ↓
+Server-Side Signature Verification
+   ↓
+Payment Confirmed
+   ↓
+Mentorship Session Activated
+```
+
+### Security
+
+The backend performs:
+
+* Razorpay order creation
+* Server-side payment verification
+* HMAC SHA-256 signature verification
+* Duplicate order protection
+* Safe session state transitions
+
+> ⚠️ Razorpay credentials must be supplied through environment variables and should never be committed to GitHub.
+
+---
+
+## 6. 🛠️ Admin Governance & Verification
+
+The admin panel provides platform management capabilities.
+
+### Verification Workbench
+
+Admins can review:
+
+* Mentor verification requests
+* LinkedIn information
+* Documents
+* Company details
+
+Admins can:
+
+* Approve verification
+* Reject verification
+
+### Moderation & Auditing
+
+The platform also supports:
+
+* User suspension
+* Report resolution
+* Administrative actions
+* Audit logging
+
+---
+
+# 🏗️ System Architecture
+
+## Technology Stack
+
+| Layer                 | Technology                        | Purpose                            |
+| --------------------- | --------------------------------- | ---------------------------------- |
+| **Backend**           | Spring Boot 3.2.3                 | REST API & application engine      |
+| **Language**          | Java 17                           | Backend development                |
+| **Security**          | Spring Security + JJWT 0.12.5     | JWT authentication & authorization |
+| **Database**          | H2 / MySQL                        | Data persistence                   |
+| **ORM**               | Spring Data JPA / Hibernate       | Object-relational mapping          |
+| **Real-Time**         | Spring WebSocket + STOMP + SockJS | Live chat                          |
+| **Payments**          | Razorpay Java SDK 1.4.6           | Mentorship payments                |
+| **API Documentation** | SpringDoc OpenAPI 2.3.0           | Swagger API documentation          |
+| **Frontend**          | React 18.2 + Vite 7.3             | Single-page application            |
+| **Styling**           | Tailwind CSS 3.4 + CSS            | UI styling                         |
+| **Icons**             | Lucide React                      | UI icons                           |
+
+---
+
+# 📐 System Architecture Diagram
 
 ```mermaid
 graph TD
-    Client[React 18 / Vite Frontend] -->|REST API Requests| SecurityFilter[JwtAuthenticationFilter]
-    Client -->|STOMP Over SockJS| WSEndpoint[WebSocket Config /ws-chat]
-    
+
+    Client[React 18 / Vite Frontend]
+
+    Client -->|REST API Requests| SecurityFilter[JWT Authentication Filter]
+    Client -->|STOMP over SockJS| WSEndpoint[WebSocket /ws-chat]
+
     SecurityFilter -->|Authenticate JWT| AuthCtrl[AuthController]
-    SecurityFilter -->|Authorize API| Controllers[API Controllers]
-    
+    SecurityFilter -->|Authorize API| Controllers[REST Controllers]
+
     subgraph Backend Services
         Controllers --> PeerSvc[PeerRequestService]
         Controllers --> BookSvc[BookingService]
@@ -88,166 +262,371 @@ graph TD
         Controllers --> ChatSvc[ChatService]
         Controllers --> AdminSvc[AdminService]
     end
-    
+
     PaySvc -->|SDK API Calls| Razorpay[Razorpay Standard Gateway]
-    PeerSvc & BookSvc & AdminSvc -->|JPA Repositories| DB[(H2 File DB / MySQL)]
+
+    PeerSvc --> DB[(H2 / MySQL)]
+    BookSvc --> DB
+    AdminSvc --> DB
 ```
 
 ---
 
-## 🗄️ Database Schema & Entities Overview
+# 🗄️ Database Schema
 
+The major entities in the application are:
+
+```text
+User
+│
+├── UserSkill
+├── Wallet
+├── PeerRequest
+│   └── RequestApplication
+│
+├── ReciprocalMatch
+│
+├── MentorshipSession
+│   └── ChatMessage
+│
+├── Payment
+├── Review
+└── MentorVerification
 ```
-User (id, name, email, password, role, verificationStatus, collegeName, course, bio, hourlyRate, alumniBenefitType, alumniDiscountPercent)
- ├── UserSkill (id, userId, skillName, type[OFFERED|WANTED], proficiency)
- ├── Wallet (id, userId, creditBalance)
- ├── PeerRequest (id, requesterId, title, category, program, creditBudget, status)
- │    └── RequestApplication (id, requestId, helperId, message, status)
- ├── ReciprocalMatch (id, userAId, userBId, requestAId, requestBId, status)
- ├── MentorshipSession (id, studentId, mentorId, scheduledTime, sessionType, creditCost, priceInINR, status)
- │    └── ChatMessage (id, sessionId, senderId, message, timestamp)
- ├── Payment (id, sessionId, razorpayOrderId, razorpayPaymentId, razorpaySignature, amount, status)
- ├── Review (id, sessionId, mentorId, studentId, rating, feedback)
- └── MentorVerification (id, userId, linkedinUrl, govtIdDocumentPath, stage, adminNotes)
-```
+
+### Entity Overview
+
+| Entity               | Purpose                                    |
+| -------------------- | ------------------------------------------ |
+| `User`               | User profile, role and account information |
+| `UserSkill`          | Offered/wanted skills                      |
+| `Wallet`             | Credit token balance                       |
+| `PeerRequest`        | Student help requests                      |
+| `RequestApplication` | Applications from potential helpers        |
+| `ReciprocalMatch`    | Mutual skill exchange                      |
+| `MentorshipSession`  | 1-on-1 mentorship booking                  |
+| `ChatMessage`        | Session chat messages                      |
+| `Payment`            | Razorpay payment information               |
+| `Review`             | Mentor/student session reviews             |
+| `MentorVerification` | Mentor/alumni verification information     |
 
 ---
 
-## 📁 Repository Directory Structure
+# 📁 Repository Structure
 
-```
+```text
 skillmentor/
-├── skillmentor-backend/            # Spring Boot Backend Service
+│
+├── README.md
+├── .gitignore
+│
+├── skillmentor-backend/
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/com/skillmentor/
-│   │   │   │   ├── config/         # Security, WebSocket, Swagger, Seeder Configs
-│   │   │   │   ├── controller/     # REST Controllers (Auth, Peer, Booking, Payment, Admin)
-│   │   │   │   ├── dto/            # Data Transfer Objects
-│   │   │   │   ├── model/          # JPA Domain Entities
-│   │   │   │   ├── repository/     # Spring Data JPA Repositories
-│   │   │   │   ├── security/       # JWT Filters & UserDetails
-│   │   │   │   └── service/        # Core Business Logic Services
+│   │   │   │   ├── config/
+│   │   │   │   ├── controller/
+│   │   │   │   ├── dto/
+│   │   │   │   ├── model/
+│   │   │   │   ├── repository/
+│   │   │   │   ├── security/
+│   │   │   │   └── service/
+│   │   │   │
 │   │   │   └── resources/
 │   │   │       ├── application.properties
 │   │   │       └── application-mysql.properties
-│   │   └── test/                   # JUnit 5 Service & Controller Unit Tests
+│   │   │
+│   │   └── test/
+│   │
+│   ├── .env.example
+│   ├── .gitignore
 │   └── pom.xml
 │
-├── skillmentor-frontend/           # React + Vite Frontend Application
-│   ├── src/
-│   │   ├── components/             # React Modular Components (Dashboards, Modals, Views)
-│   │   ├── services/               # Fetch API Client & Request Helpers
-│   │   ├── utils/                  # Date & String Formatter Helpers
-│   │   ├── App.jsx                 # Main Application Layout & State Router
-│   │   └── index.css               # Global Styling & Design Tokens
-│   ├── package.json
-│   └── vite.config.js
-│
-├── brain.md                        # Architectural Blueprint & Production Specification
-└── README.md                       # Project GitHub Documentation
+└── skillmentor-frontend/
+    ├── src/
+    │   ├── components/
+    │   ├── services/
+    │   ├── utils/
+    │   ├── App.jsx
+    │   └── index.css
+    │
+    ├── public/
+    ├── .env.example
+    ├── .gitignore
+    ├── package.json
+    ├── package-lock.json
+    └── vite.config.js
 ```
 
 ---
 
-## ⚡ Quick Start & Setup Guide
+# ⚡ Getting Started
 
-### 📋 Prerequisites
-- **Java Development Kit (JDK)**: 17 or higher
-- **Apache Maven**: 3.8+
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher
+## 📋 Prerequisites
+
+Make sure the following are installed:
+
+* **JDK:** Java 17+
+* **Maven:** 3.8+
+* **Node.js:** Compatible with the project's Vite version
+* **npm:** 9+
 
 ---
 
-### 1️⃣ Setting Up the Backend
+## 🔐 Environment Variables
+
+Before starting the application, create the required environment configuration.
+
+Use the provided example file:
+
+```text
+.env.example
+```
+
+Create your local `.env` file and add your own development credentials.
+
+### Example
+
+```env
+RAZORPAY_KEY_ID=your_razorpay_test_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_test_key_secret
+```
+
+> Never commit `.env` or real credentials to GitHub.
+
+---
+
+# 🚀 Backend Setup
+
+Navigate to the backend:
 
 ```bash
-# Navigate to backend directory
 cd skillmentor-backend
+```
 
-# Build and start Spring Boot Application (Port 8080)
+Install/build and start the Spring Boot application:
+
+```bash
 mvn clean spring-boot:run
 ```
 
-Once started, access:
-- **API Base Endpoint**: `http://localhost:8080/api`
-- **Swagger OpenAPI Documentation**: `http://localhost:8080/swagger-ui.html`
-- **H2 Console**: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:file:./data/skillmentor_db`, User: `sa`, Password: *blank*)
+The backend runs on:
 
----
-
-### 2️⃣ Setting Up the Frontend
-
-```bash
-# Open a new terminal and navigate to frontend directory
-cd skillmentor-frontend
-
-# Install dependencies
-npm install
-
-# Start Vite Development Server (Port 5173)
-npx vite --host 0.0.0.0 --port 5173
+```text
+http://localhost:8080
 ```
 
-Open your browser and navigate to **`http://localhost:5173`**.
+### API Base URL
+
+```text
+http://localhost:8080/api
+```
+
+### Swagger UI
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+### H2 Console
+
+```text
+http://localhost:8080/h2-console
+```
+
+Default development database:
+
+```text
+jdbc:h2:file:./data/skillmentor_db
+```
 
 ---
 
-## 🔐 Seeded Test Accounts
+# 💻 Frontend Setup
 
-The platform automatically seeds demo accounts upon startup via `DatabaseSeeder.java`:
+Open a new terminal:
 
-| Role | Email | Password | Details |
-| :--- | :--- | :--- | :--- |
-| 🎓 **Student** | `student@jssaten.ac.in` | `password123` | Pre-loaded with ⚡ 50 Credit Tokens |
-| 👔 **Mentor** | `mentor.alex@tech.com` | `password123` | Verified Senior Tech Mentor |
-| 🎓 **Alumni** | `alumni.sarah@faang.com` | `password123` | Verified Alumni with Same-College Free Benefit |
-| 🛠️ **Admin** | `admin@skillmentor.com` | `password123` | Full access to Admin Governance Panel |
+```bash
+cd skillmentor-frontend
+```
 
----
+Install dependencies:
 
-## 📡 API Endpoint Overview
+```bash
+npm install
+```
 
-### Authentication (`/api/auth`)
-- `POST /api/auth/register` - Register a new user (`STUDENT`, `MENTOR`, `ALUMNI`)
-- `POST /api/auth/login` - Authenticate user & receive JWT token
+Start the development server:
 
-### Peer Requests & Swaps (`/api/peer-requests`)
-- `GET /api/peer-requests` - List active peer requests (filtered by program/category)
-- `POST /api/peer-requests` - Create a peer help request with credit budget
-- `POST /api/peer-requests/{id}/apply` - Apply to help on a request
-- `POST /api/peer-requests/{id}/select/{applicationId}` - Select helper & lock session
-- `POST /api/peer-requests/{id}/complete` - Mark complete & transfer wallet credits
+```bash
+npm run dev
+```
 
-### Mentorship Sessions (`/api/bookings`)
-- `POST /api/bookings` - Book a 1-on-1 session with a mentor
-- `GET /api/bookings` - Retrieve user sessions
-- `PATCH /api/bookings/{sessionId}/status` - Accept / Reject session
+The frontend runs on:
 
-### Razorpay Payments (`/api/payments/razorpay`)
-- `POST /api/payments/razorpay/order` - Generate Razorpay Order ID
-- `POST /api/payments/razorpay/verify` - Verify signature & activate session
-
-### Live Chat (`/api/chat` & `/ws-chat`)
-- `WS /ws-chat` - STOMP WebSocket connection
-- `SEND /app/chat.send/{sessionId}` - Dispatch real-time message
-- `GET /api/chat/history/{sessionId}` - Retrieve session chat history
+```text
+http://localhost:5173
+```
 
 ---
 
-## 🧪 Running Unit Tests
+# 🔐 Demo Accounts
 
-Run the unit test suite for backend services:
+The application provides development/demo accounts through `DatabaseSeeder.java`.
+
+| Role       | Email                    | Password      | Details                 |
+| ---------- | ------------------------ | ------------- | ----------------------- |
+| 🎓 Student | `student@jssaten.ac.in`  | `password123` | 50 Credit Tokens        |
+| 👔 Mentor  | `mentor.rajeev@tech.com`   | `password123` | Verified Mentor         |
+| 🎓 Alumni  | `alumni.himanshu@faang.com` | `password123` | Verified Alumni         |
+| 🛠️ Admin  | `admin@skillmentor.com`  | `password123` | Admin Governance Access |
+
+> **Note:** These are development/demo credentials only. Do not use these credentials in production.
+
+---
+
+# 📡 API Overview
+
+## Authentication
+
+**Base URL:** `/api/auth`
+
+| Method | Endpoint    | Description                       |
+| ------ | ----------- | --------------------------------- |
+| `POST` | `/register` | Register a new user               |
+| `POST` | `/login`    | Authenticate user and receive JWT |
+
+---
+
+## Peer Requests & Skill Exchange
+
+**Base URL:** `/api/peer-requests`
+
+| Method | Endpoint                       | Description                           |
+| ------ | ------------------------------ | ------------------------------------- |
+| `GET`  | `/`                            | List active peer requests             |
+| `POST` | `/`                            | Create a peer help request            |
+| `POST` | `/{id}/apply`                  | Apply to help on a request            |
+| `POST` | `/{id}/select/{applicationId}` | Select a helper                       |
+| `POST` | `/{id}/complete`               | Complete request and transfer credits |
+
+---
+
+## Mentorship Sessions
+
+**Base URL:** `/api/bookings`
+
+| Method  | Endpoint              | Description               |
+| ------- | --------------------- | ------------------------- |
+| `POST`  | `/`                   | Book a mentorship session |
+| `GET`   | `/`                   | Retrieve user sessions    |
+| `PATCH` | `/{sessionId}/status` | Accept/reject session     |
+
+---
+
+## Razorpay Payments
+
+**Base URL:** `/api/payments/razorpay`
+
+| Method | Endpoint  | Description              |
+| ------ | --------- | ------------------------ |
+| `POST` | `/order`  | Create Razorpay order    |
+| `POST` | `/verify` | Verify payment signature |
+
+---
+
+## Live Chat
+
+**REST Base URL:** `/api/chat`
+
+| Method | Endpoint               | Description           |
+| ------ | ---------------------- | --------------------- |
+| `GET`  | `/history/{sessionId}` | Retrieve chat history |
+
+### WebSocket
+
+```text
+WS /ws-chat
+```
+
+### Send Message
+
+```text
+SEND /app/chat.send/{sessionId}
+```
+
+---
+
+# 🧪 Testing
+
+Run backend tests:
 
 ```bash
 cd skillmentor-backend
 mvn test
 ```
 
-<p align="center">
-  Crafted with ❤️ for student learning and mentorship networks.
-</p>
+The project uses **JUnit 5** for backend testing.
+
+---
+
+# 🔒 Security
+
+SkillMentor implements several security mechanisms:
+
+* JWT-based authentication
+* Spring Security
+* BCrypt password hashing
+* Stateless authentication
+* Role-based authorization
+* Server-side session authorization
+* Razorpay HMAC signature verification
+* Environment-based credential management
+* Development-only demo data seeding
+
+---
+
+# 💳 Payment Security
+
+Razorpay is integrated using the following flow:
+
+```text
+Frontend
+   ↓
+Backend creates Razorpay Order
+   ↓
+Razorpay Checkout
+   ↓
+Payment Completed
+   ↓
+Backend receives Payment Details
+   ↓
+HMAC Signature Verification
+   ↓
+Payment Status Updated
+   ↓
+Mentorship Session Activated
 ```
-#   s k i l l m e n t o r 
- 
+
+Only **Razorpay test credentials** should be used during development.
+
+---
+
+# 🧪 Development Database
+
+H2 is used for convenient local development.
+
+MySQL configuration is also included for environments where a persistent relational database is required.
+
+The project supports:
+
+```text
+Development → H2
+Deployment   → MySQL
+```
+
+## ❤️ Acknowledgement
+
+<p align="center">
+  Built with ❤️ as a student project focused on peer learning, mentorship, and skill exchange.
+</p>
