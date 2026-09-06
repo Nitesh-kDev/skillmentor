@@ -626,6 +626,8 @@ Deployment   → MySQL
 
 This project was designed and developed by **Nitesh Kumar**  
 Master of Computer Applications (MCA), JSS Academy of Technical Education, Noida
+
+
 [![GitHub](https://img.shields.io/badge/GitHub-Nitesh--kDev-black?style=for-the-badge&logo=github)](https://github.com/Nitesh-kDev)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Nitesh--Kumar-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/nitesh-kumar-3b70bb387/)
 
