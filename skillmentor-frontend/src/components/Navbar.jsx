@@ -80,7 +80,7 @@ export default function Navbar({
           {/* Brand Logo Image */}
           <div
             className="flex items-center space-x-3 cursor-pointer shrink-0"
-            onClick={() => handleNavigate(currentUser ? (isAdmin ? 'admin' : (isMentorOrAlumni ? 'mentorDashboard' : 'discovery')) : 'landing')}
+            onClick={() => handleNavigate('landing')}
           >
             <img src="/logo.png" alt="SkillMentor Logo" className="h-9 object-contain" />
           </div>
