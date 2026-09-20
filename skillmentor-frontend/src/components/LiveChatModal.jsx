@@ -56,11 +56,22 @@ export default function LiveChatModal({ isOpen, onClose, session, currentUser })
     }
   };
 
+  const getWsUrl = () => {
+    if (import.meta.env.VITE_WS_URL) {
+      return import.meta.env.VITE_WS_URL;
+    }
+    if (import.meta.env.VITE_API_BASE_URL) {
+      return import.meta.env.VITE_API_BASE_URL.replace(/\/api\/?$/, '/ws');
+    }
+    const wsHost = window.location.hostname || 'localhost';
+    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+    return `${protocol}//${wsHost}:8080/ws`;
+  };
+
   const connectWebSocket = () => {
     setConnectionState('connecting');
     try {
-      const wsHost = window.location.hostname || 'localhost';
-      const socket = new SockJS(`http://${wsHost}:8080/ws`);
+      const socket = new SockJS(getWsUrl());
       const stompClient = Stomp.over(socket);
       stompClient.debug = null; // Suppress debug logs
 

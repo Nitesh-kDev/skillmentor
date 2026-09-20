@@ -1,15 +1,22 @@
 package com.skillmentor.repository;
 
 import com.skillmentor.model.PeerRequest;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PeerRequestRepository extends JpaRepository<PeerRequest, Long> {
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM PeerRequest p WHERE p.id = :id")
+    Optional<PeerRequest> findByIdForUpdate(@Param("id") Long id);
 
     List<PeerRequest> findByStatus(PeerRequest.Status status);
 

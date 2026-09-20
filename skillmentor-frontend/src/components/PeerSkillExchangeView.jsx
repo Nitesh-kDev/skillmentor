@@ -35,6 +35,8 @@ export default function PeerSkillExchangeView({ currentUser, onProfileUpdated, o
   const [activeViewApplicationsRequest, setActiveViewApplicationsRequest] = useState(null);
   const [applications, setApplications] = useState([]);
 
+  const [completingRequestId, setCompletingRequestId] = useState(null);
+
   const currentUserId = currentUser ? (currentUser.id || currentUser.userId) : null;
 
   const categories = [
@@ -221,6 +223,8 @@ export default function PeerSkillExchangeView({ currentUser, onProfileUpdated, o
   };
 
   const handleCompleteRequest = async (requestId) => {
+    if (completingRequestId) return;
+    setCompletingRequestId(requestId);
     setError('');
     setSuccessMsg('');
     try {
@@ -230,6 +234,8 @@ export default function PeerSkillExchangeView({ currentUser, onProfileUpdated, o
       if (onProfileUpdated) onProfileUpdated();
     } catch (err) {
       setError(err.message || 'Failed to complete request');
+    } finally {
+      setCompletingRequestId(null);
     }
   };
 
@@ -551,10 +557,11 @@ export default function PeerSkillExchangeView({ currentUser, onProfileUpdated, o
                             {req.status === 'IN_PROGRESS' && (
                               <button
                                 onClick={() => handleCompleteRequest(req.id)}
-                                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition-all flex items-center space-x-1"
+                                disabled={completingRequestId === req.id}
+                                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl shadow-xs transition-all flex items-center space-x-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 <CheckCircle2 className="w-4 h-4" />
-                                <span>Mark Completed (Transfer Credits)</span>
+                                <span>{completingRequestId === req.id ? 'Completing...' : 'Mark Completed (Transfer Credits)'}</span>
                               </button>
                             )}
 

@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Component
-@Profile("!prod")
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
+        name = "app.seed.enabled", havingValue = "true", matchIfMissing = true
+)
 @RequiredArgsConstructor
 public class DatabaseSeeder implements CommandLineRunner {
 

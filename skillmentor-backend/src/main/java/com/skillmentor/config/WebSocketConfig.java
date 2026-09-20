@@ -8,22 +8,24 @@ import org.springframework.web.socket.config.annotation.*;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000}")
+    private String allowedOrigins;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        String[] allowedOrigins = new String[]{
-                "http://localhost:5173",
-                "http://127.0.0.1:5173",
-                "http://localhost:3000"
-        };
+        String[] origins = java.util.Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toArray(String[]::new);
 
-        // Register WebSocket STOMP endpoint with SockJS fallback
+        // Register WebSocket STOMP endpoint with SockJS fallback (supports Vercel domains and preview URLs)
         registry.addEndpoint("/ws")
-                .setAllowedOrigins(allowedOrigins)
+                .setAllowedOriginPatterns(origins)
                 .withSockJS();
 
         // Native WebSocket STOMP endpoint without SockJS wrapper
         registry.addEndpoint("/ws-raw")
-                .setAllowedOrigins(allowedOrigins);
+                .setAllowedOriginPatterns(origins);
     }
 
     @Override

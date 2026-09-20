@@ -236,11 +236,21 @@ public class PeerRequestService {
      */
     @Transactional
     public PeerRequestResponseDto completeRequest(Long requestId, Long requesterId) {
-        PeerRequest request = peerRequestRepository.findById(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("Student help request not found with id: " + requestId));
+        PeerRequest request = peerRequestRepository.findByIdForUpdate(requestId)
+                .orElseGet(() -> peerRequestRepository.findById(requestId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Student help request not found with id: " + requestId)));
 
         if (!request.getRequester().getId().equals(requesterId)) {
             throw new UnauthorizedAccessException("Only the requester can mark this request as COMPLETED");
+        }
+
+        // Idempotent: If already COMPLETED, do not execute credit transfer again
+        if (request.getStatus() == PeerRequest.Status.COMPLETED) {
+            return mapToDto(request);
+        }
+
+        if (request.getStatus() == PeerRequest.Status.CANCELLED) {
+            throw new BadRequestException("Cancelled requests cannot be marked COMPLETED");
         }
 
         if (request.getStatus() != PeerRequest.Status.IN_PROGRESS && request.getStatus() != PeerRequest.Status.OPEN) {
@@ -254,24 +264,40 @@ public class PeerRequestService {
             throw new BadRequestException("No applicant selected for this in-progress request");
         }
 
-        // Execute Credit Transfer if applicant selected
+        // Execute Credit Transfer if applicant selected and credits not already settled
         if (selectedApp != null) {
             User requester = request.getRequester();
             User helper = selectedApp.getApplicant();
-            int budget = request.getCreditBudget();
+            int budget = request.getCreditBudget() != null ? request.getCreditBudget() : 0;
 
-            walletService.transferCredits(
-                    requester.getId(),
-                    helper.getId(),
-                    budget,
-                    "Completed Student Help Request: " + request.getTitle()
-            );
-
-            // Also update associated MentorshipSession status to COMPLETED
+            // Check if credit has already been settled on associated session
             List<MentorshipSession> sessions = sessionRepository.findByStudentOrMentor(requester, requester);
+            boolean alreadySettled = false;
             for (MentorshipSession s : sessions) {
-                if (s.getMentor().getId().equals(helper.getId()) && s.getStatus() != MentorshipSession.SessionStatus.COMPLETED) {
+                if (s.getMentor().getId().equals(helper.getId()) &&
+                        (s.getTitle() != null && s.getTitle().contains(request.getTitle())) &&
+                        Boolean.TRUE.equals(s.getCreditSettled())) {
+                    alreadySettled = true;
+                    break;
+                }
+            }
+
+            // Transfer credits exactly once
+            if (!alreadySettled && budget > 0) {
+                walletService.transferCredits(
+                        requester.getId(),
+                        helper.getId(),
+                        budget,
+                        "Completed Student Help Request: " + request.getTitle()
+                );
+            }
+
+            // Also update associated MentorshipSession status to COMPLETED and creditSettled to true
+            for (MentorshipSession s : sessions) {
+                if (s.getMentor().getId().equals(helper.getId()) &&
+                        (s.getTitle() != null && s.getTitle().contains(request.getTitle()))) {
                     s.setStatus(MentorshipSession.SessionStatus.COMPLETED);
+                    s.setCreditSettled(true);
                     sessionRepository.save(s);
                 }
             }

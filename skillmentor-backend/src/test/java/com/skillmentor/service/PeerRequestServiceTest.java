@@ -2,7 +2,9 @@ package com.skillmentor.service;
 
 import com.skillmentor.dto.PeerRequestDtos.CreatePeerRequestDto;
 import com.skillmentor.dto.PeerRequestDtos.PeerRequestResponseDto;
+import com.skillmentor.exception.BadRequestException;
 import com.skillmentor.exception.InsufficientBalanceException;
+import com.skillmentor.exception.UnauthorizedAccessException;
 import com.skillmentor.model.*;
 import com.skillmentor.repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -101,6 +104,81 @@ public class PeerRequestServiceTest {
         verify(walletService, times(1)).transferCredits(
                 eq(1L), eq(2L), eq(20), contains("Completed Student Help Request")
         );
+    }
+
+    @Test
+    void testCompleteRequest_HelpingStudentCallsCompletion_ThrowsUnauthorizedException() {
+        // Arrange: Helper (ID 2L) tries to complete request created by requester (ID 1L)
+        when(peerRequestRepository.findById(100L)).thenReturn(Optional.of(peerRequest));
+
+        // Act & Assert
+        UnauthorizedAccessException ex = assertThrows(
+                UnauthorizedAccessException.class,
+                () -> peerRequestService.completeRequest(100L, 2L)
+        );
+
+        assertTrue(ex.getMessage().contains("Only the requester can mark this request as COMPLETED"));
+        verify(walletService, never()).transferCredits(any(), any(), any(), any());
+        verify(peerRequestRepository, never()).save(any(PeerRequest.class));
+    }
+
+    @Test
+    void testCompleteRequest_AlreadyCompleted_IdempotentNoTransfer() {
+        // Arrange: Request is already COMPLETED
+        peerRequest.setStatus(PeerRequest.Status.COMPLETED);
+        when(peerRequestRepository.findById(100L)).thenReturn(Optional.of(peerRequest));
+
+        // Act
+        PeerRequestResponseDto result = peerRequestService.completeRequest(100L, 1L);
+
+        // Assert: Returns completed DTO without transferring credits
+        assertNotNull(result);
+        assertEquals(PeerRequest.Status.COMPLETED, result.getStatus());
+        verify(walletService, never()).transferCredits(any(), any(), any(), any());
+    }
+
+    @Test
+    void testCompleteRequest_SessionAlreadySettled_NoDoubleTransfer() {
+        // Arrange: Associated MentorshipSession was already creditSettled = true
+        when(peerRequestRepository.findById(100L)).thenReturn(Optional.of(peerRequest));
+        when(applicationRepository.findByPeerRequestIdAndStatus(100L, RequestApplication.Status.SELECTED))
+                .thenReturn(Optional.of(selectedApplication));
+        when(peerRequestRepository.save(any(PeerRequest.class))).thenAnswer(i -> i.getArgument(0));
+
+        MentorshipSession settledSession = MentorshipSession.builder()
+                .id(999L)
+                .student(requester)
+                .mentor(helper)
+                .title("Student Help: Java Peer Help")
+                .creditSettled(true)
+                .status(MentorshipSession.SessionStatus.COMPLETED)
+                .build();
+        when(sessionRepository.findByStudentOrMentor(requester, requester)).thenReturn(List.of(settledSession));
+
+        // Act
+        PeerRequestResponseDto result = peerRequestService.completeRequest(100L, 1L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(PeerRequest.Status.COMPLETED, result.getStatus());
+        // Transfer should NOT be called again because session was already creditSettled
+        verify(walletService, never()).transferCredits(any(), any(), any(), any());
+    }
+
+    @Test
+    void testCompleteRequest_CancelledRequest_ThrowsBadRequestException() {
+        // Arrange: Request is CANCELLED
+        peerRequest.setStatus(PeerRequest.Status.CANCELLED);
+        when(peerRequestRepository.findById(100L)).thenReturn(Optional.of(peerRequest));
+
+        // Act & Assert
+        BadRequestException ex = assertThrows(
+                BadRequestException.class,
+                () -> peerRequestService.completeRequest(100L, 1L)
+        );
+
+        assertTrue(ex.getMessage().contains("Cancelled requests cannot be marked COMPLETED"));
+        verify(walletService, never()).transferCredits(any(), any(), any(), any());
     }
 
     @Test

@@ -352,7 +352,7 @@ export default function MentorDashboard({ currentUser, onOpenChat }) {
                       {s.scheduledTime ? new Date(s.scheduledTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : '—'} ({s.durationMinutes}m)
                     </td>
                     <td className="p-3 font-black text-slate-900">
-                      {s.sessionType === 'PEER_CREDIT' ? `⚡ ${s.creditCost} Credits` : (s.paymentRequired ? `₹${s.priceInINR}` : 'FREE')}
+                      {s.sessionType === 'PEER_CREDIT' ? ((s.creditCost === 0 || s.title?.toLowerCase().includes('reciprocal')) ? 'Free Swap' : `⚡ ${s.creditCost} Credits`) : (s.paymentRequired ? `₹${s.priceInINR}` : 'FREE')}
                     </td>
                     <td className="p-3">
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-50 text-amber-700 border border-amber-200">
@@ -428,7 +428,7 @@ export default function MentorDashboard({ currentUser, onOpenChat }) {
                       {s.scheduledTime ? new Date(s.scheduledTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : '—'}
                     </td>
                     <td className="p-3 font-black text-slate-900">
-                      {s.sessionType === 'PEER_CREDIT' ? `⚡ ${s.creditCost} Credits` : (s.paymentRequired ? `₹${s.priceInINR}` : 'FREE')}
+                      {s.sessionType === 'PEER_CREDIT' ? ((s.creditCost === 0 || s.title?.toLowerCase().includes('reciprocal')) ? 'Free Swap' : `⚡ ${s.creditCost} Credits`) : (s.paymentRequired ? `₹${s.priceInINR}` : 'FREE')}
                     </td>
                     <td className="p-3">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
@@ -440,7 +440,7 @@ export default function MentorDashboard({ currentUser, onOpenChat }) {
                     </td>
                     <td className="p-3 text-right">
                       <div className="flex items-center justify-end space-x-2">
-                        {s.status === 'ACCEPTED' && (
+                        {s.status === 'ACCEPTED' && !s.title?.toLowerCase().includes('help') && !s.title?.toLowerCase().includes('request') && s.sessionType !== 'PEER_CREDIT' && (
                           <button
                             onClick={() => handleStatusUpdate(s.id, 'COMPLETED')}
                             className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-xl shadow-xs transition-all flex items-center gap-1 cursor-pointer"

@@ -78,9 +78,20 @@ export default function BookingModal({ isOpen, onClose, selectedMentor, currentU
 
     setLoading(true);
     try {
+      let finalTitle = formData.title?.trim();
+      if (isPeerMatch) {
+        if (!finalTitle) {
+          finalTitle = `Reciprocal Swap: ${selectedMentor.peerOffersSkill || 'Skills'}`;
+        } else if (!finalTitle.toLowerCase().includes('reciprocal')) {
+          finalTitle = `Reciprocal Swap: ${finalTitle}`;
+        }
+      } else if (!finalTitle) {
+        finalTitle = isPeerSwap ? `Peer Skill Exchange: ${formData.topicSkill || 'Tech'}` : `Mentorship Session: ${formData.topicSkill || 'Tech'}`;
+      }
+
       const payload = {
         mentorId: mentorId,
-        title: formData.title || (isPeerMatch ? `Reciprocal Swap: ${selectedMentor.peerOffersSkill || 'Skills'}` : (isPeerSwap ? `Peer Skill Exchange: ${formData.topicSkill || 'Tech'}` : `Mentorship Session: ${formData.topicSkill || 'Tech'}`)),
+        title: finalTitle,
         topicSkill: formData.topicSkill || (selectedMentor.peerOffersSkill || 'Mentorship'),
         scheduledTime: formData.scheduledTime,
         durationMinutes: durationMin,

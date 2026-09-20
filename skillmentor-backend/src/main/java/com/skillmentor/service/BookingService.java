@@ -1,6 +1,7 @@
 package com.skillmentor.service;
 
 import com.skillmentor.dto.SessionDtos.*;
+import com.skillmentor.exception.UnauthorizedAccessException;
 import com.skillmentor.model.*;
 import com.skillmentor.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class BookingService {
     private final WalletService walletService;
     private final PaymentRepository paymentRepository;
     private final ReviewRepository reviewRepository;
+    private final PeerRequestRepository peerRequestRepository;
 
     @Transactional
     public BookingResponse createBooking(Long studentId, BookingRequest request) {
@@ -65,9 +67,20 @@ public class BookingService {
             type = MentorshipSession.SessionType.PAID_MENTOR;
         }
 
-        int creditCost = type == MentorshipSession.SessionType.PEER_CREDIT ? 10 : 0;
+        int creditCost = 0;
+        if (type == MentorshipSession.SessionType.PEER_CREDIT) {
+            boolean isExplicitFreeSwap = request.getCreditCost() != null && request.getCreditCost() == 0;
+            boolean isReciprocalTitle = request.getTitle() != null &&
+                    request.getTitle().toLowerCase().contains("reciprocal");
 
-        // Balance Validation for Credit Sessions: Ensure student has enough credits (at least 10 credits)
+            if (isExplicitFreeSwap || isReciprocalTitle) {
+                creditCost = 0;
+            } else {
+                creditCost = (request.getCreditCost() != null && request.getCreditCost() > 0) ? request.getCreditCost() : 10;
+            }
+        }
+
+        // Balance Validation for Credit Sessions: Ensure student has enough credits (at least 10 credits for paid peer swaps)
         if (type == MentorshipSession.SessionType.PEER_CREDIT && creditCost > 0) {
             Wallet studentWallet = walletRepository.findByUser(student).orElse(null);
             int balance = studentWallet != null ? studentWallet.getCreditBalance() : 0;
@@ -112,10 +125,23 @@ public class BookingService {
             }
         }
 
+        String sessionTitle = request.getTitle();
+        if (sessionTitle == null || sessionTitle.trim().isEmpty()) {
+            if (type == MentorshipSession.SessionType.PEER_CREDIT) {
+                sessionTitle = (creditCost == 0) ? "Reciprocal Swap: Peer Skill Exchange" : "Peer Skill Swap";
+            } else {
+                sessionTitle = "Mentorship Guidance Session";
+            }
+        } else if (type == MentorshipSession.SessionType.PEER_CREDIT && creditCost == 0) {
+            if (!sessionTitle.toLowerCase().contains("reciprocal")) {
+                sessionTitle = "Reciprocal Swap: " + sessionTitle.trim();
+            }
+        }
+
         MentorshipSession session = MentorshipSession.builder()
                 .student(student)
                 .mentor(mentor)
-                .title(request.getTitle() != null ? request.getTitle() : (type == MentorshipSession.SessionType.PEER_CREDIT ? "Peer Skill Swap" : "Mentorship Guidance Session"))
+                .title(sessionTitle)
                 .topicSkill(request.getTopicSkill() != null ? request.getTopicSkill() : "General Guidance")
                 .scheduledTime(request.getScheduledTime())
                 .durationMinutes(durationMin)
@@ -126,7 +152,7 @@ public class BookingService {
                 .sameCollegeAlumniBenefitApplied(benefitApplied)
                 .paymentRequired(paymentRequired)
                 .status(MentorshipSession.SessionStatus.PENDING)
-                .creditSettled(false)
+                .creditSettled(creditCost == 0)
                 .build();
 
         session = sessionRepository.save(session);
@@ -136,11 +162,22 @@ public class BookingService {
 
     @Transactional
     public BookingResponse updateSessionStatus(Long sessionId, Long userId, MentorshipSession.SessionStatus newStatus) {
-        MentorshipSession session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new RuntimeException("Session not found"));
+        MentorshipSession session = sessionRepository.findByIdForUpdate(sessionId)
+                .orElseGet(() -> sessionRepository.findById(sessionId)
+                        .orElseThrow(() -> new RuntimeException("Session not found")));
 
         if (!session.getMentor().getId().equals(userId) && !session.getStudent().getId().equals(userId)) {
-            throw new RuntimeException("Unauthorized to update session status");
+            throw new UnauthorizedAccessException("Unauthorized to update session status");
+        }
+
+        boolean isHelpRequest = (session.getTitle() != null && session.getTitle().startsWith("Student Help:"))
+                || (session.getTitle() != null && (session.getTitle().toLowerCase().contains("help") || session.getTitle().toLowerCase().contains("request")) && session.getSessionType() == MentorshipSession.SessionType.PEER_CREDIT);
+
+        // If it's a student help request, ONLY the original requesting student can mark it COMPLETED!
+        if (isHelpRequest && newStatus == MentorshipSession.SessionStatus.COMPLETED) {
+            if (!session.getStudent().getId().equals(userId)) {
+                throw new UnauthorizedAccessException("Only the requesting student who created the help request can mark it completed");
+            }
         }
 
         session.setStatus(newStatus);
@@ -163,6 +200,21 @@ public class BookingService {
 
             session.setCreditSettled(true);
             session = sessionRepository.save(session);
+        }
+
+        // Synchronize PeerRequest status if this was a student help request marked COMPLETED
+        if (isHelpRequest && newStatus == MentorshipSession.SessionStatus.COMPLETED) {
+            List<PeerRequest> userRequests = peerRequestRepository.findByRequesterId(session.getStudent().getId());
+            String expectedTitle = session.getTitle().startsWith("Student Help: ") ?
+                    session.getTitle().substring("Student Help: ".length()).trim() : session.getTitle().trim();
+
+            for (PeerRequest pr : userRequests) {
+                if (pr.getStatus() != PeerRequest.Status.COMPLETED &&
+                        (pr.getTitle().trim().equalsIgnoreCase(expectedTitle) || session.getTitle().contains(pr.getTitle().trim()))) {
+                    pr.setStatus(PeerRequest.Status.COMPLETED);
+                    peerRequestRepository.save(pr);
+                }
+            }
         }
 
         return mapToBookingResponse(session);

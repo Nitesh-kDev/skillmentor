@@ -79,7 +79,10 @@ public class SecurityConfig {
 
         String[] origins = allowedOrigins.split(",");
         for (String origin : origins) {
-            configuration.addAllowedOrigin(origin.trim());
+            String trimmed = origin.trim();
+            if (!trimmed.isEmpty()) {
+                configuration.addAllowedOriginPattern(trimmed);
+            }
         }
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

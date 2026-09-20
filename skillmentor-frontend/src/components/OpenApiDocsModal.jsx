@@ -4,6 +4,8 @@ import { X, ExternalLink, Code, CheckCircle2 } from 'lucide-react';
 export default function OpenApiDocsModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
+  const swaggerUrl = import.meta.env.VITE_SWAGGER_URL || (import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/?$/, '/swagger-ui.html') : 'http://localhost:8080/swagger-ui.html');
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
       <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[700px]">
@@ -17,7 +19,7 @@ export default function OpenApiDocsModal({ isOpen, onClose }) {
 
           <div className="flex items-center space-x-3">
             <a
-              href="http://localhost:8080/swagger-ui.html"
+              href={swaggerUrl}
               target="_blank"
               rel="noreferrer"
               className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors"
@@ -34,7 +36,7 @@ export default function OpenApiDocsModal({ isOpen, onClose }) {
         {/* Embedded Swagger UI iframe */}
         <div className="flex-1 bg-slate-100">
           <iframe
-            src="http://localhost:8080/swagger-ui.html"
+            src={swaggerUrl}
             title="Swagger UI API Docs"
             className="w-full h-full border-none"
           />

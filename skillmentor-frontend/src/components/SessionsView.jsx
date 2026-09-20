@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  MessageSquare, 
-  CreditCard, 
-  Star, 
-  RefreshCw, 
-  AlertCircle, 
-  CheckCircle2, 
-  XCircle, 
-  Zap, 
-  GraduationCap, 
+import {
+  Calendar,
+  Clock,
+  MessageSquare,
+  CreditCard,
+  Star,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+  Zap,
+  GraduationCap,
   Check,
   UserCheck,
-  Compass
+  Compass,
+  ArrowRightLeft
 } from 'lucide-react';
 import { api } from '../services/api';
 import { formatSessionDateTime } from '../utils/dateUtils';
@@ -23,6 +24,7 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
+  const [updatingStatusId, setUpdatingStatusId] = useState(null);
 
   const currentUserId = currentUser ? (currentUser.id || currentUser.userId) : null;
 
@@ -44,6 +46,8 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
   };
 
   const handleUpdateStatus = async (sessionId, newStatus) => {
+    if (updatingStatusId) return;
+    setUpdatingStatusId(sessionId);
     setError('');
     setMsg('');
     try {
@@ -53,12 +57,14 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
       if (onProfileUpdated) onProfileUpdated();
     } catch (err) {
       setError(err.message || 'Failed to update session status');
+    } finally {
+      setUpdatingStatusId(null);
     }
   };
 
   return (
     <div className="space-y-8 animate-fade-in pb-12">
-      
+
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
         <div>
@@ -116,10 +122,16 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
           {sessions.length > 0 ? (
             sessions.map((session) => {
               const isUserStudentInSession = currentUserId != null && Number(currentUserId) === Number(session.studentId);
-              
+
+              // Help Request Check (Student Help Requests vs Mentorship sessions)
+              const isHelpRequest = Boolean(
+                session.title?.toLowerCase().includes('help') ||
+                session.title?.toLowerCase().includes('request')
+              );
+
               // Dynamic Participant Name & Role Resolution (STEP 2)
               const partnerName = isUserStudentInSession ? session.mentorName : session.studentName;
-              
+
               // Provider & Participant Role Mapping
               const rawRole = isUserStudentInSession ? session.mentorRole : session.studentRole;
               let partnerRoleLabel = 'Student';
@@ -132,8 +144,8 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
               }
 
               // Payment requirement check
-              const isPaymentRequired = session.paymentRequired == null 
-                ? (session.sessionType === 'PAID_MENTOR' && session.priceInINR > 0) 
+              const isPaymentRequired = session.paymentRequired == null
+                ? (session.sessionType === 'PAID_MENTOR' && session.priceInINR > 0)
                 : Boolean(session.paymentRequired);
 
               // Payment Button strictly for STUDENT on PENDING paid sessions
@@ -144,9 +156,9 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
               // Rating Eligibility Check (STEP 6 & STEP 7):
               // Ratings allowed ONLY for MENTOR or ALUMNI providers on COMPLETED sessions
               const isProviderMentorOrAlumni = rawRole === 'MENTOR' || rawRole === 'ALUMNI' || session.mentorRole === 'MENTOR' || session.mentorRole === 'ALUMNI';
-              const canReviewSession = isUserStudentInSession && 
-                isProviderMentorOrAlumni && 
-                session.status === 'COMPLETED' && 
+              const canReviewSession = isUserStudentInSession &&
+                isProviderMentorOrAlumni &&
+                session.status === 'COMPLETED' &&
                 !session.hasBeenReviewed;
 
               const isAlreadyReviewed = isUserStudentInSession && isProviderMentorOrAlumni && Boolean(session.hasBeenReviewed);
@@ -169,18 +181,21 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
                   );
                 } else {
                   // PEER_CREDIT
-                  if (session.creditCost === 0) {
+                  const isReciprocalSwap = session.creditCost === 0 ||
+                    (session.title && session.title.toLowerCase().includes('reciprocal'));
+
+                  if (isReciprocalSwap) {
                     return (
-                      <span className="text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 font-extrabold text-xs">
-                        Free Mutual Swap
+                      <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 font-extrabold text-xs">
+                        <ArrowRightLeft className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>Free Mutual Swap</span>
                       </span>
                     );
                   }
-                  const isHelpRequest = session.title?.toLowerCase().includes('help') || session.title?.toLowerCase().includes('request');
                   return (
                     <span className="text-slate-800 font-extrabold text-xs flex items-center gap-1">
                       <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-400 shrink-0" />
-                      <span>{isHelpRequest ? 'Student Help' : `⚡ ${session.creditCost || 10} Credit Swap`}</span>
+                      <span>{isHelpRequest ? 'Student Help' : `${session.creditCost || 10} Credit Swap`}</span>
                     </span>
                   );
                 }
@@ -206,14 +221,14 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
               const badge = getStatusBadge();
 
               return (
-                <div 
-                  key={session.id} 
+                <div
+                  key={session.id}
                   className="bg-white border border-slate-200/80 p-5 rounded-3xl shadow-2xs hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-5"
                 >
-                  
+
                   {/* Left Info Column */}
                   <div className="space-y-2 flex-1">
-                    
+
                     <div className="flex flex-wrap items-center gap-2">
                       {/* User-Friendly Status Badge (STEP 5) */}
                       <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-extrabold border ${badge.class}`}>
@@ -226,7 +241,7 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
 
                     {/* Session Title */}
                     <h3 className="font-extrabold text-slate-900 text-base leading-snug">{session.title}</h3>
-                    
+
                     {/* Dynamic Role Display (STEP 2): "With: Adarsh Porwal · Student" */}
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600 font-medium">
                       <span>
@@ -259,7 +274,7 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
 
                   {/* Right Action Buttons */}
                   <div className="flex flex-wrap items-center gap-2 self-start md:self-center shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 w-full md:w-auto justify-end">
-                    
+
                     {/* ACCEPT / DECLINE BUTTONS FOR PENDING REQUESTS (MENTOR / ALUMNI / PROVIDER) */}
                     {session.status === 'PENDING' && !isUserStudentInSession && (
                       <div className="flex items-center space-x-2 w-full sm:w-auto">
@@ -281,16 +296,23 @@ export default function SessionsView({ currentUser, onOpenChat, onOpenReview, on
                       </div>
                     )}
 
-                    {/* MARK SESSION COMPLETED BUTTON STRICTLY FOR MENTOR / ALUMNI */}
-                    {session.status === 'ACCEPTED' && !isUserStudentInSession && (
-                      <button
-                        onClick={() => handleUpdateStatus(session.id, 'COMPLETED')}
-                        className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-extrabold text-xs rounded-xl border border-emerald-200 transition-all flex items-center space-x-1.5 cursor-pointer"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        <span>Mark Session Completed</span>
-                      </button>
-                    )}
+                    {/* MARK SESSION COMPLETED BUTTON:
+                        - For Student Help Requests: ONLY the requesting student (isUserStudentInSession) who originally created the request can complete it. The helping student (!isUserStudentInSession) must NEVER have this button.
+                        - For regular Mentorship Guidance: strictly the mentor/alumni provider (!isUserStudentInSession).
+                    */}
+                    {session.status === 'ACCEPTED' && (
+                      (isHelpRequest && isUserStudentInSession) ||
+                      (!isHelpRequest && !isUserStudentInSession)
+                    ) && (
+                        <button
+                          onClick={() => handleUpdateStatus(session.id, 'COMPLETED')}
+                          disabled={updatingStatusId === session.id}
+                          className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-extrabold text-xs rounded-xl border border-emerald-200 transition-all flex items-center space-x-1.5 cursor-pointer disabled:opacity-50"
+                        >
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                          <span>Mark {isHelpRequest ? 'Request' : 'Session'} Completed</span>
+                        </button>
+                      )}
 
                     {/* STRICTLY STUDENT ONLY PAYMENT BUTTON */}
                     {showPaymentButton && (
