@@ -17,6 +17,8 @@
 
 ## 📌 Overview
 
+🔗 **Live Demo:** https://skillmentor-nitesh-dev1.vercel.app/
+
 **SkillMentor** is an educational platform designed to connect students across multiple academic programs such as **BTech, MCA, BBA, MBA, LLB**, and more.
 
 The platform enables students to:
